@@ -5,19 +5,19 @@ import random
 
 app = Ursina()
 
-window.fps_counter.enabled = False
-window.exit_button.visible = False
+window.fps_counter.enabled = False  #프레임값 안보이게 삭제
+window.exit_button.visible = False  #창 닫는 부분 안보이게 삭제
 
-punch = Audio('blocks/assets_punch.wav', autoplay=False)
+punch = Audio('blocks/assets_punch.wav', autoplay=False)  #블럭 부수는 소리 재생, 시작시 자동재생 방지
 
 pygame.mixer.init(44100, -16, 2, 512)
 pygame.mixer.set_num_channels(32)
-pygame.mixer.music.load('Minecraft.mp3')
+pygame.mixer.music.load('Minecraft.mp3')  #마인크래프트 배경음악 재생
 pygame.mixer.music.play(-1)
 
 
 
-blocks = [
+blocks = [    #블럭에 적용할 텍스처값 리스트
     load_texture('blocks/assets_dia.png'),  # 0
     load_texture('blocks/assets_glass.png'),  # 1
     load_texture('blocks/assets_stone.png'),  # 2
@@ -33,7 +33,7 @@ blocks = [
 block_id = 1
 
 
-def input(key):
+def input(key):  #블럭 종류와 블럭에 지정된 키 함수
     global block_id, hand
     if key.isdigit():
         block_id = int(key)
@@ -42,7 +42,7 @@ def input(key):
         hand.texture = blocks[block_id]
 
 
-sky = Entity(
+sky = Entity(     #하늘 만들기
     parent=scene,
     model='sphere',
     texture=load_texture('blocks/assets_sky.jpg'),
@@ -50,7 +50,7 @@ sky = Entity(
     double_sided=True
 )
 
-hand = Entity(
+hand = Entity(    #손에 들고 있는 블록 표현하기
     parent=camera.ui,
     model='block',
     texture=blocks[block_id],
@@ -60,7 +60,7 @@ hand = Entity(
 )
 
 
-class health:
+class health:      #체력바 표현하기
     health1 = Entity(
         parent=camera.ui,
         model='cube',
@@ -142,7 +142,7 @@ class health:
     )
 
 
-class hunger:
+class hunger:      #배고픔바 표현하기
     hunger1 = Entity(
         parent=camera.ui,
         model='cube',
@@ -224,7 +224,7 @@ class hunger:
     )
 
 
-def update():
+def update():      #클릭할때 움직이는 모션 표현, 소리 발생
     if held_keys['right mouse'] or held_keys['left mouse']:
         punch.play()
         hand.position = Vec2(0.4, -0.5)
@@ -232,11 +232,7 @@ def update():
         hand.position = Vec2(0.6, -0.6)
 
 
-# if held_keys['esc']:
-#    stop
-
-
-class Voxel(Button):
+class Voxel(Button):        #초기 맵 초기화 및 설정 1층 잔디를 나타내는 클래스
     def __init__(self, position=(0, 0, 0), texture='blocks/assets_grass.png'):
         super().__init__(
             parent=scene,
@@ -248,7 +244,7 @@ class Voxel(Button):
             scale=0.5
         )
 
-    def input(self, key):
+    def input(self, key):       #클릭 했을 때 블럭 설치, 파괴하는 함수
         if self.hovered:
             if key == 'right mouse down':
                 Voxel(position=self.position + mouse.normal, texture=blocks[block_id])
@@ -256,7 +252,7 @@ class Voxel(Button):
                 destroy(self)
 
 
-class Voxel1(Button):
+class Voxel1(Button):       #초기 맵 초기화 및 설정 1층 아래 돌 블럭을 나타내는 클래스
     def __init__(self, position=(0, 0, 0), texture='blocks/assets_stone.png'):
         super().__init__(
             parent=scene,
@@ -268,14 +264,14 @@ class Voxel1(Button):
             scale=0.5
         )
 
-    def input(self, key):
+    def input(self, key):       #클릭 했을 때 블럭 설치, 파괴하는 함수
         if self.hovered:
             if key == 'right mouse down':
                 Voxel(position=self.position + mouse.normal, texture=blocks[block_id])
             elif key == 'left mouse down':
                 destroy(self)
 
-class Voxel2(Button):
+class Voxel2(Button):       #초기 맵 초기화 및 설정 1층 아래 돌 블럭 중 일부를 다이아몬드 원석으로 바꾸는 클래스
     def __init__(self, position=(0, 0, 0), texture='blocks/assets_dia.png'):
         super().__init__(
             parent=scene,
@@ -287,7 +283,7 @@ class Voxel2(Button):
             scale=0.5
         )
 
-    def input(self, key):
+    def input(self, key):       #클릭 했을 때 블럭 설치, 파괴하는 함수
         if self.hovered:
             if key == 'right mouse down':
                 Voxel(position=self.position + mouse.normal, texture=blocks[block_id])
@@ -295,16 +291,16 @@ class Voxel2(Button):
                 destroy(self)
 
 
-for z in range(25):
+for z in range(25):     #1층 잔디
     for x in range(25):
         voxel = Voxel(position=(x, 0, z))
 
-for z in range(25):
+for z in range(25):     #1층 아래 돌
     for x in range(25):
         for y in range(-7, 0, 1):
             voxel1 = Voxel1(position=(x, y, z))
 
-for i in range(25):
+for i in range(25):     #1층 아래 돌 중 다이아몬드
     a = random.randrange(1, 21)
     b = random.randrange(-7, 0)
     c = random.randrange(1, 21)
